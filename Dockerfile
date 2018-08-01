@@ -1,7 +1,7 @@
 FROM golang:1.9.2-stretch
-RUN mkdir -p /go/src/gitlab.com/bitfly/TezProxy/build
-ADD . /go/src/gitlab.com/bitfly/TezProxy
-WORKDIR /go/src/gitlab.com/bitfly/TezProxy
+RUN mkdir -p /go/src/github.com/tezexInfo/TezProxy
+ADD . /go/src/github.com/tezexInfo/TezProxy
+WORKDIR /go/src/github.com/tezexInfo/TezProxy
 RUN go get -d .
 RUN CGO_ENABLED=0 go build -o build/app .
 
