@@ -15,11 +15,11 @@ Example `config.yml`:
 
 ```
 tezos:
-  host: 127.0.0.1  // Tezos Node Host
+  host: tezos      // should be `tezos`for recommended Setup
   port: 8732       // Tezos Node Port
 
 server:
-  port: 8899       // Port that TezProxy will run at
+  port: 80       // Port that TezProxy will run at
 
 proxy:
   readTimeout: 1
@@ -38,3 +38,34 @@ proxy:
   rateLimitCount: 100
   cacheMaxItems: 2000   // max size of LRU Cache
 ```  
+
+## Docker
+
+Autmated Docker Builds for TezProxy are available at:
+
+https://hub.docker.com/r/tezexinfo/tezproxy/
+
+## Recommended Setup
+
+If you plan to run TezProxy as a public api endpoint ( for apps like tezbox ) we recommend the following Setup:
+
+
+1.) Start with any number of Servers, preferably in different Datacenters
+
+2.) install Docker and docker-compose on all Servers: https://docs.docker.com/install/
+
+3.) Pick one Server as your Swarm Manager and run `docker swarm init`
+
+4.) join all other Servers into the swarm using the command in the output of #3
+
+5.) On the Swarm Manager: Copy the confiy.yml - Example from above and import it into Docker Swarm Configs
+
+   ```
+   docker config create tezproxy_config config.yml
+   ```
+
+6.) Run the following Commands to install the Tezos Node and TezRPC
+
+```
+WIP
+```

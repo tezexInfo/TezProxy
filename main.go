@@ -14,7 +14,7 @@ func main (){
 
 	vip := viper.New()
 	vip.AddConfigPath(".")
-	vip.AddConfigPath("/etc/tezrpc/")
+	vip.AddConfigPath("/etc/tezproxy/")
 	vip.SetConfigName(ConfigPath)
 	vip.ReadInConfig()
 
