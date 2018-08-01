@@ -1,0 +1,33 @@
+version: "3.3"
+
+services:
+
+  tezos:
+    image: tezos/tezos:betanet
+    deploy:
+      restart_policy:
+        condition: on-failure
+        max_attempts: 10
+        window: 120s
+      mode: global
+
+
+
+  tezrpc:
+    image: tezexinfo/tezproxy
+    deploy:
+      restart_policy:
+        condition: on-failure
+        max_attempts: 10
+        window: 120s
+      mode: global
+    configs:
+      - source: tezproxy_config
+        target: /etc/tezproxy/config.yml
+    ports:
+      - 80:80
+
+
+configs:
+  tezproxy_config:
+    external: true
