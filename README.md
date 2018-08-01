@@ -60,12 +60,26 @@ If you plan to run TezProxy as a public api endpoint ( for apps like tezbox ) we
 
 5.) On the Swarm Manager: Copy the confiy.yml - Example from above and import it into Docker Swarm Configs
 
-   ```
-   docker config create tezproxy_config config.yml
-   ```
+```
+$ docker config create tezproxy_config config.yml
+```
 
 6.) Run the following Commands to install the Tezos Node and TezRPC
 
 ```
-WIP
+$ wget https://raw.githubusercontent.com/tezexInfo/TezProxy/master/swarmCompose/docker-compose.yml
+$ docker stack deploy tezproxy -c docker-compose.yml
 ```
+
+After this it might take your node some time to generate a new identity and sync the blockchain, but after a few minutes
+your TezProxy shouldbe ready to go!
+
+
+If you want yo can also install a very simple Monitoring Service that will check your Tezos Nodes, TezProxy instances
+as well as your general Server Statistics by following the guide on:
+
+https://github.com/stefanprodan/swarmprom
+
+And after that, you will get a Monitoring Dashboard that will look a lot like:
+
+![monitoring](https://raw.githubusercontent.com/tezexInfo/TezProxy/master/tezproxy_mon.png "TezProxy Moitoring")
