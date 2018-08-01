@@ -5,7 +5,7 @@ import (
 	"os"
 	"github.com/spf13/viper"
 	"os/signal"
-	"github.com/tezexInfo/TezProxy"
+	"github.com/tezexInfo/TezProxy/proxy"
 )
 
 const ConfigPath = "config"
@@ -14,7 +14,7 @@ func main (){
 
 	vip := viper.New()
 	vip.AddConfigPath(".")
-	vip.AddConfigPath("/etc/tezproxy")
+	vip.AddConfigPath("/etc/tezrpc/")
 	vip.SetConfigName(ConfigPath)
 	vip.ReadInConfig()
 

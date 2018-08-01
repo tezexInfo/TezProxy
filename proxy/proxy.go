@@ -43,7 +43,7 @@ func (this *Proxy) Start(){
 func (this *Proxy) startServer(){
 
 	setupRegexp(this)
-	this.cache = lru.New(5000)
+	this.cache = lru.New(this.Config.CacheMaxItems)
 
 	srv := http.Server{
 		Addr:         ":" + strconv.Itoa(this.Config.ServerPort),

@@ -7,5 +7,5 @@ RUN CGO_ENABLED=0 go build -o build/app .
 
 FROM scratch
 WORKDIR /
-COPY --from=0 /go/src/gitlab.com/bitfly/TezProxy/build/app /app
+COPY --from=0 /go/src/github.com/tezexInfo/TezProxy/build/app /app
 CMD ["/app"]
