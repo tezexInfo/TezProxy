@@ -17,6 +17,7 @@ proxy:
     - /netowork(.*?)
   dontCache:
     - (.*?)/head/(.*?)
+    - /chains/main/blocks$
   rateLimitPeriod: 100
   rateLimitCount: 100
   cacheMaxItems: 2000

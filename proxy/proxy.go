@@ -67,10 +67,8 @@ func (this *Proxy) startServer(){
 		if this.isAllowed(req.URL.Path) {
 
 			if req.Method == "GET" && this.isCacheable(req.URL.Path){
-				fmt.Println("is cacheable")
 				if val, ok := this.cache.Get(req.URL.Path); ok {
 					tezresponse = val.([]byte)
-					fmt.Println("from cache")
 				} else {
 					tezresponse = this.GetResponse(req)
 					this.cache.Add(req.URL.Path,tezresponse)

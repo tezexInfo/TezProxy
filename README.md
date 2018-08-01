@@ -34,6 +34,7 @@ proxy:
     - /netowork(.*?)
   dontCache:            // all calls get cached per default, except:
     - (.*?)/head/(.*?)
+    - /chains/main/blocks$
   rateLimitPeriod: 100  // time in seconds
   rateLimitCount: 100
   cacheMaxItems: 2000   // max size of LRU Cache
