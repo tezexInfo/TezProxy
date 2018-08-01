@@ -5,7 +5,7 @@ import (
 	"os"
 	"github.com/spf13/viper"
 	"os/signal"
-	"gitlab.com/bitfly/TezProxy/proxy"
+	"github.com/tezexInfo/TezProxy"
 )
 
 const ConfigPath = "config"
