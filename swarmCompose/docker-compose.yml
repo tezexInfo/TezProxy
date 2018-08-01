@@ -23,7 +23,7 @@ services:
       mode: global
     configs:
       - source: tezproxy_config
-        target: /etc/tezproxy/config.yml
+        target: /config.yml
     ports:
       - 80:80
 
