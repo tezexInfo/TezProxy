@@ -14,7 +14,7 @@ proxy:
   blockedMethods:
     - (.*?)context/contracts$
     - /monitor(.*?)
-    - /netowork(.*?)
+    - /network(.*?)
   dontCache:
     - (.*?)/head/(.*?)
     - /chains/main/blocks$

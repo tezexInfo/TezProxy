@@ -82,6 +82,8 @@ func (this *Proxy) startServer(){
 				this.proxy.ServeHTTP(w,req)
 			}
 
+		} else {
+			fmt.Fprint(w, string(tezresponse))
 		}
 	}
 	http.Handle("/", middleware.Handler(http.HandlerFunc(handlerfunc)))
@@ -118,11 +120,12 @@ func setupRegexp(this *Proxy) {
 
 
 func (this *Proxy) isAllowed(url string) bool {
-	ret := true
+	ret := false
 	urls := strings.Split(url,"?")
 	url = "/" + strings.Trim(urls[0], "/")
 	for _,wl := range this.whitelistedR {
 		if wl.Match([]byte(url)) {
+			ret = true
 			for _, bl := range this.blacklsitedR {
 				if bl.Match([]byte(url)) {
 					ret = false
