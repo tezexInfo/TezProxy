@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"github.com/sirupsen/logrus"
 	"time"
+	"fmt"
 	"bytes"
 	"io/ioutil"
 	"github.com/ulule/limiter"
@@ -71,11 +72,13 @@ func (this *Proxy) startServer(){
 				if val, ok := this.cache.Get(req.URL.Path); ok {
 					tezresponse = val.([]byte)
 				} else {
+					tezresponse = this.GetTezosResponse(req.URL.Path,"")
 					this.cache.Add(req.URL.Path,tezresponse)
 				}
 				optionsHeaders(w)
+				fmt.Fprint(w, string(tezresponse))
+
 			} else {
-				// cant cache POST stuff
 				this.proxy.ServeHTTP(w,req)
 			}
 
@@ -145,6 +148,7 @@ func (this *Proxy) isCacheable(url string) bool {
 
 func (this *Proxy) PostTezosResponse(req *http.Request) []byte {
 	req.Host = this.Config.TezosHost + ":" + strconv.Itoa(this.Config.TezosPort)
+
 	client := &http.Client{Timeout: time.Duration(this.Config.ReadTimeout) * time.Second}
 	resp, err := client.Do(req)
 	var b []byte
