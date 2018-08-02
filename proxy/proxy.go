@@ -5,16 +5,16 @@ import (
 	"net/http"
 	"github.com/sirupsen/logrus"
 	"time"
-	"fmt"
 	"bytes"
 	"io/ioutil"
 	"github.com/ulule/limiter"
 	"github.com/ulule/limiter/drivers/store/memory"
 	"github.com/ulule/limiter/drivers/middleware/stdlib"
-	"io"
 	"regexp"
 	"strings"
 	"github.com/golang/groupcache/lru"
+	"net/http/httputil"
+	"net/url"
 )
 
 type Proxy struct {
@@ -24,10 +24,12 @@ type Proxy struct {
 	blacklsitedR []*regexp.Regexp
 	dontCacheR []*regexp.Regexp
 	cache *lru.Cache
+	proxy  *httputil.ReverseProxy
 }
 
 func NewProxy(config ProxyConfig,log *logrus.Logger) *Proxy {
-	p := Proxy{Config: config,Log: log}
+	reverse_url,_ := url.Parse("http://" + config.TezosHost + ":" + strconv.Itoa(config.TezosPort))
+	p := Proxy{Config: config,Log: log, proxy: httputil.NewSingleHostReverseProxy(reverse_url)}
 	return &p
 }
 
@@ -41,7 +43,6 @@ func (this *Proxy) Start(){
 
 
 func (this *Proxy) startServer(){
-
 	setupRegexp(this)
 	this.cache = lru.New(this.Config.CacheMaxItems)
 
@@ -70,32 +71,18 @@ func (this *Proxy) startServer(){
 				if val, ok := this.cache.Get(req.URL.Path); ok {
 					tezresponse = val.([]byte)
 				} else {
-					tezresponse = this.GetResponse(req)
 					this.cache.Add(req.URL.Path,tezresponse)
 				}
-
+				optionsHeaders(w)
 			} else {
-				tezresponse = this.GetResponse(req)
+				// cant cache POST stuff
+				this.proxy.ServeHTTP(w,req)
 			}
 
 		}
-
-		optionsHeaders(w)
-		fmt.Fprint(w, string(tezresponse))
 	}
 	http.Handle("/", middleware.Handler(http.HandlerFunc(handlerfunc)))
 	srv.ListenAndServe()
-}
-
-func (this *Proxy) GetResponse(req *http.Request) []byte {
-	tezresponse := []byte(string("Method not allowed"))
-	if req.Method == "GET" {
-		tezresponse = this.GetTezosResponse(req.URL.Path, "")
-	}
-	if req.Method == "POST" {
-		tezresponse = this.PostTezosResponse(req.URL.Path, req.Body)
-	}
-	return tezresponse
 }
 
 func setupRegexp(this *Proxy) {
@@ -156,16 +143,9 @@ func (this *Proxy) isCacheable(url string) bool {
 }
 
 
-func (this *Proxy) PostTezosResponse(url string, body io.ReadCloser) []byte {
-	url = "http://" + this.Config.TezosHost + ":" + strconv.Itoa(this.Config.TezosPort) + url
-	bodyb, err := ioutil.ReadAll(body)
-	buffer := bytes.NewBuffer(bodyb)
-	req, err := http.NewRequest("POST", url, buffer)
-	if err != nil {
-		this.Log.Error("Error sending POST to Tezos", err)
-	}
-
-	client := &http.Client{Timeout: 45 * time.Second}
+func (this *Proxy) PostTezosResponse(req *http.Request) []byte {
+	req.Host = this.Config.TezosHost + ":" + strconv.Itoa(this.Config.TezosPort)
+	client := &http.Client{Timeout: time.Duration(this.Config.ReadTimeout) * time.Second}
 	resp, err := client.Do(req)
 	var b []byte
 	b, err = ioutil.ReadAll(resp.Body)
@@ -184,7 +164,7 @@ func (this *Proxy) GetTezosResponse(url, args string) []byte {
 		this.Log.Error("Error sending GET to Tezos", err)
 	}
 
-	client := &http.Client{Timeout: 45 * time.Second}
+	client := &http.Client{Timeout: time.Duration(this.Config.ReadTimeout) * time.Second}
 	resp, err := client.Do(req)
 	var b []byte
 	b, err = ioutil.ReadAll(resp.Body)
